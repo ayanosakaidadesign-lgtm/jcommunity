@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCommunity - London Life Guide</title>
+    
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #f8fafc; --text: #1e293b; --accent: #3b82f6;
+            --c-blue: #bae6fd; --c-green: #bbf7d0; --c-orange: #fed7aa;
+            --c-rose: #fecdd3; --c-indigo: #c7d2fe; --c-amber: #fde68a;
+            --c-violet: #ddd6fe; --c-slate: #e2e8f0;
+            --line-color: #334155;
+        }
+
+        body { background-color: var(--bg); font-family: 'Noto Sans JP', sans-serif; margin: 0; color: var(--text); overflow-x: hidden; }
+        
+        #main-page, #detail-page, #post-page, #legal-page { display: none; }
+        #main-page { display: block; }
+
+        /* ナビゲーション */
+        .navbar { background: white; padding: 10px 20px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: center; }
+        .nav-content { max-width: 1100px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .jc-logo { display: flex; align-items: flex-end; gap: 12px; cursor: pointer; text-decoration: none; color: inherit; }
+        .jc-symbol { width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; font-family: 'Plus Jakarta Sans'; font-size: 24px; font-weight: 800; display: flex; justify-content: center; align-items: center; border-radius: 10px; }
+        .jc-main-title { font-family: 'Plus Jakarta Sans'; font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 2px; }
+        .logo-skyline { height: 35px; width: 120px; fill: none; stroke: var(--line-color); stroke-width: 1.5; margin-bottom: 2px; opacity: 0.8; }
+
+        /* ヒーロー */
+        .hero { background: white; padding: 60px 20px 40px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        .hero h1 { font-family: 'Plus Jakarta Sans'; font-size: 3.5rem; font-weight: 800; margin: 0; letter-spacing: 2px; color: #1e293b; }
+        .hero p { color: #64748b; font-size: 1.1rem; margin-top: 10px; font-weight: 500; }
+
+        /* カテゴリ */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        .category-card { border-radius: 24px; padding: 30px 15px; display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; cursor: pointer; }
+        .category-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .icon-box { width: 60px; height: 60px; background: rgba(255,255,255,0.6); border-radius: 20px; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; font-size: 32px; }
+        
+        .sumai { background-color: var(--c-blue); } .kyujin { background-color: var(--c-green); } .uri { background-color: var(--c-orange); } .kai { background-color: var(--c-rose); }
+        .lesson { background-color: var(--c-indigo); } .service { background-color: var(--c-amber); } .circle { background-color: var(--c-violet); } .info { background-color: var(--c-slate); }
+
+        /* 掲示板 */
+        .board-item { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 15px; align-items: center; cursor: pointer; }
+        .board-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #eee; flex-shrink: 0; }
+        .board-tag { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 50px; background: #e2e8f0; min-width: 80px; text-align: center; }
+
+        /* 投稿の詳細スタイル */
+        .post-item { background: #f8fafc; padding: 25px; border-radius: 20px; margin-bottom: 25px; border-left: 6px solid var(--accent); position: relative; }
+        .post-img-display { width: 100%; max-height: 400px; object-fit: cover; border-radius: 15px; margin: 15px 0; }
+        .post-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; }
+        .btn-sm { padding: 5px 12px; font-size: 11px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* フォーム */
+        .container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        .image-upload-box { border: 2px dashed #e2e8f0; padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; }
+        #image-preview { max-width: 100%; max-height: 200px; margin-top: 10px; display: none; border-radius: 8px; }
+        .submit-btn { width: 100%; padding: 15px; background: #3b82f6; color: white; border: none; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        footer { background: #1e293b; color: white; padding: 60px 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="jc-logo" onclick="showMain()">
+                <div class="jc-symbol">J</div>
+                <div class="jc-main-title">JCommunity</div>
+                <svg class="logo-skyline" viewBox="0 0 400 100">
+                    <path d="M10 100 L10 40 L20 40 L20 100 M15 50 L15 60 M40 100 Q40 50 70 50 Q100 50 100 100 M130 100 L150 20 L170 100 M200 100 L200 60 L230 60 L230 100 M200 75 Q215 75 230 75 M260 100 Q250 80 260 40 Q270 30 280 40 Q290 80 280 100" />
+                </svg>
+            </div>
+            <div style="font-size: 14px; font-weight: bold; color: #3b82f6; cursor: pointer;" onclick="showPostPage()">+ NEW POST</div>
+        </div>
+    </nav>
+
+    <!-- メイン -->
+    <div id="main-page">
+        <header class="hero"><h1>LONDON</h1><p>日本人のための、スマートなコミュニティガイド。</p></header>
+        <section class="grid-container">
+            <div class="category-card sumai" onclick="showPage('住まい・宿泊', '🏠')"><div class="icon-box">🏠</div><div class="category-name">住まい・宿泊</div></div>
+            <div class="category-card kyujin" onclick="showPage('求人', '💼')"><div class="icon-box">💼</div><div class="category-name">求人</div></div>
+            <div class="category-card uri" onclick="showPage('売ります', '🏷️')"><div class="icon-box">🏷️</div><div class="category-name">売ります</div></div>
+            <div class="category-card kai" onclick="showPage('買います', '🛒')"><div class="icon-box">🛒</div><div class="category-name">買います</div></div>
+            <div class="category-card lesson" onclick="showPage('レッスン', '📖')"><div class="icon-box">📖</div><div class="category-name">レッスン</div></div>
+            <div class="category-card service" onclick="showPage('サービス', '🛠️')"><div class="icon-box">🛠️</div><div class="category-name">サービス</div></div>
+            <div class="category-card circle" onclick="showPage('サークル', '👥')"><div class="icon-box">👥</div><div class="category-name">サークル</div></div>
+            <div class="category-card info" onclick="showPage('お知らせ', '📢')"><div class="icon-box">📢</div><div class="category-name">お知らせ</div></div>
+        </section>
+        <section style="max-width: 1100px; margin: 0 auto 60px; padding: 0 20px;">
+            <h2 style="font-size:20px; font-weight:800; margin-bottom:20px;">最近の投稿</h2>
+            <div id="featured-board" style="background: white; border-radius: 30px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;"></div>
+        </section>
+        <footer>
+            <div style="max-width:1100px; margin:0 auto; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:40px; text-align: left;">
+                <div><h3>JCommunity LONDON</h3><p style="opacity:0.6; font-size:14px;">ロンドン在住日本人のためのポータルサイト。</p></div>
+                <div><h3>Legal</h3><li style="list-style:none; opacity:0.6; cursor:pointer;" onclick="showLegal('terms')">利用規約</li><li style="list-style:none; opacity:0.6; cursor:pointer;" onclick="showLegal('disclaimer')">免責事項</li></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 投稿画面 -->
+    <div id="post-page"><div class="container">
+        <div onclick="showMain()" style="cursor:pointer; font-weight:bold; margin-bottom:20px;">← CANCEL</div>
+        <h1 id="form-title">NEW POST</h1>
+        <form id="post-form" onsubmit="handlePost(event)">
+            <input type="hidden" id="edit-id">
+            <div class="form-group"><label>Category</label><select id="post-category" required><option>住まい・宿泊</option><option>求人</option><option>売ります</option><option>買います</option><option>レッスン</option><option>サービス</option><option>サークル</option><option>お知らせ</option></select></div>
+            <div class="form-group"><label>Title</label><input type="text" id="post-title" required></div>
+            <div class="form-group"><label>Content</label><textarea id="post-content" rows="6" required></textarea></div>
+            <div class="form-group"><label>Password</label><input type="password" id="post-password" required></div>
+            <div class="form-group">
+                <label>Photo</label>
+                <div class="image-upload-box" onclick="document.getElementById('file-input').click()">
+                    📸 写真を選択
+                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="previewImage(this)">
+                    <img id="image-preview">
+                </div>
+            </div>
+            <button type="submit" class="submit-btn" id="submit-btn-text">PUBLISH</button>
+        </form>
+    </div></div>
+
+    <!-- 詳細画面 -->
+    <div id="detail-page"><div class="container"><div onclick="showMain()" style="cursor:pointer; font-weight:bold; margin-bottom:20px;">← BACK</div><div style="display:flex; align-items:center; gap:20px; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:30px;"><div id="page-icon" style="font-size:50px;"></div><h1 id="page-title" style="margin:0;"></h1></div><div id="posts-list"></div></div></div>
+
+    <script>
+        let allPosts = [];
+        let currentImageData = "";
+
+        function switchScreen(id) { document.querySelectorAll('#main-page, #detail-page, #post-page').forEach(s => s.style.display = 'none'); document.getElementById(id).style.display = 'block'; window.scrollTo(0,0); }
+        function showMain() { switchScreen('main-page'); renderFeatured(); }
+        
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; currentImageData = e.target.result; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function handlePost(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-id').value;
+            const data = {
+                id: editId || Date.now().toString(),
+                category: document.getElementById('post-category').value,
+                title: document.getElementById('post-title').value,
+                content: document.getElementById('post-content').value,
+                password: document.getElementById('post-password').value,
+                image: currentImageData,
+                date: new Date().toLocaleDateString()
+            };
+            if (editId) { allPosts[allPosts.findIndex(p => p.id === editId)] = data; } 
+            else { allPosts.push(data); }
+            e.target.reset(); document.getElementById('image-preview').style.display = 'none'; currentImageData = "";
+            showMain();
+        }
+
+        function renderFeatured() {
+            const board = document.getElementById('featured-board');
+            board.innerHTML = allPosts.length ? allPosts.slice().reverse().map(p => `
+                <div class="board-item" onclick="showPage('${p.category}', '')">
+                    <img src="${p.image || ''}" class="board-thumb" style="display:${p.image?'block':'none'}">
+                    <div class="board-tag">${p.category}</div>
+                    <div class="board-info"><b>${p.title}</b><br><small>${p.date}</small></div>
+                </div>
+            `).join('') : '<div style="padding:20px; text-align:center; color:#94a3b8;">投稿はありません。</div>';
+        }
+
+        function showPage(cat, icon) {
+            switchScreen('detail-page');
+            document.getElementById('page-title').innerText = cat;
+            document.getElementById('page-icon').innerText = icon;
+            const list = document.getElementById('posts-list');
+            const filtered = allPosts.filter(p => p.category === cat);
+            list.innerHTML = filtered.length ? filtered.slice().reverse().map(p => `
+                <div class="post-item">
+                    <b>${p.title}</b><small>📅 ${p.date}</small>
+                    ${p.image ? `<img src="${p.image}" class="post-img-display">` : ''}
+                    <p>${p.content}</p>
+                </div>
+            `).join('') : '<div style="text-align:center; padding:50px; color:#94a3b8;">まだ投稿がありません。</div>';
+        }
+
+        function showPostPage() { switchScreen('post-page'); document.getElementById('post-form').reset(); document.getElementById('image-preview').style.display = 'none'; currentImageData = ""; }
+    </script>
+</body>
+</html>
